@@ -847,8 +847,10 @@ describe("Falcon", async () =>
             }
 
             assert.equal(ret, expectedRet, errorStr);
+
             let tx = await falconInstance.verify.apply(null, verifyArgs);
             let receipt = await tx.wait();
+            console.log(`Gas used used for a successful verification: ${receipt.gasUsed}`);
             assert.equal(receipt.status, true);
         });
     });

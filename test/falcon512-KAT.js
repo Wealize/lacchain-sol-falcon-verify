@@ -71,6 +71,9 @@ describe("Falcon", async () =>
       let falconInstance;
       let precompiledContractAddress = falcConsts.FALCON_PRECOMPILED_ADDRESS;
 
+      let precompiledTime=0;
+      let solidityTime=0;
+
       before(async () =>
       {
         const kats = await parseKats(fs.createReadStream('test/falcon512-KAT.rsp'));
@@ -91,14 +94,26 @@ describe("Falcon", async () =>
         {
           suite.addTest(new Test(`KAT test ${kat.count} (solidity)`, async() =>
           {
-           await verifyKat(kat, falconCommonInterface, solidityFalconAddress); 
+            timeBefore = (new Date()).getTime();
+            await verifyKat(kat, falconCommonInterface, solidityFalconAddress); 
+            timeAfter = (new Date()).getTime();
+            solidityTime += (timeAfter - timeBefore);
           }));
 
           suite.addTest(new Test(`KAT test ${kat.count} (precompiled)`, async() =>
           {
-           await verifyKat(kat, falconCommonInterface, precompiledContractAddress); 
+            timeBefore = (new Date()).getTime();
+            await verifyKat(kat, falconCommonInterface, precompiledContractAddress); 
+            timeAfter = (new Date()).getTime();
+            precompiledTime += (timeAfter - timeBefore);
           }));
         });
+      });
+
+      after(async () =>
+      {
+          console.log(`Precompiled time -> Total: ${precompiledTime}ms / Por firma: ${precompiledTime/100}ms`);
+          console.log(`Solidity time -> Total: ${solidityTime}ms / Por firma: ${solidityTime/100}ms`)
       });
 
       it.skip("dummy", () =>
